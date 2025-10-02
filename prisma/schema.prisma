@@ -20,6 +20,30 @@ enum ContractStatus {
     Failed
 }
 
+// Internal job state for the background analysis worker.
+enum AnalysisStatus {
+    Queued
+    Running
+    Succeeded
+    Failed
+}
+
+// Risk level of a clause.
+enum RiskLevel {
+    Safe
+    Caution
+    Escalate
+}
+
+// Types of flags.
+enum FlagType {
+    Indemnity
+    NonSolicitation
+    GoverningLaw
+    LiquidatedDamages
+    Other
+}
+
 /**
  * ===== Models =====
  */
@@ -31,4 +55,23 @@ model Contract {
     updatedAt DateTime @default(now()) @updatedAt
 
     status ContractStatus @default(Processing)
+
+    analysisStatus AnalysisStatus @default(Queued)
+    analysisError  String?
+
+    flaggedClauses FlaggedClause[]
+}
+
+model FlaggedClause {
+    id         String   @id @default(cuid())
+    contractId String
+    contract   Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
+
+    type    FlagType
+    risk    RiskLevel @default(Escalate)
+    snippet String
+    start   Int
+    end     Int
+
+    createdAt DateTime @default(now())
 }

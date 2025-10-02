@@ -1,6 +1,6 @@
 import { Prisma } from "@prisma/client";
 
-export type { ContractStatus } from "@prisma/client";
+export type { ContractStatus, FlagType, RiskLevel } from "@prisma/client";
 
 /* -------------------------------------------------------------------------- */
 /*  Helper: table row “select” for the UI’s Previous Contracts table          */

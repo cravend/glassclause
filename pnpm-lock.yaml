@@ -47,6 +47,9 @@ importers:
       next:
         specifier: ^15.2.3
         version: 15.5.4(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+      openai:
+        specifier: ^6.0.1
+        version: 6.0.1(zod@3.25.76)
       react:
         specifier: ^19.0.0
         version: 19.2.0
@@ -825,6 +828,18 @@ packages:
   ohash@2.0.11:
     resolution: {integrity: sha512-RdR9FQrFwNBNXAr4GixM8YaRZRJ5PUWbKYbE5eOsrwAjJW0q2REGcf79oYPsLyskQCZG1PLN+S/K1V00joZAoQ==}
 
+  openai@6.0.1:
+    resolution: {integrity: sha512-Xf9k3/Ezckp0aQmkU7LTXPg9dTxo3uspuJqxotHF3Jscq0r7EU0KEoqesQVxoQ6YeAzd/jlm7kxayZufpYRJUQ==}
+    hasBin: true
+    peerDependencies:
+      ws: ^8.18.0
+      zod: ^3.25 || ^4.0
+    peerDependenciesMeta:
+      ws:
+        optional: true
+      zod:
+        optional: true
+
   pathe@2.0.3:
     resolution: {integrity: sha512-WUjGcAqP1gQacoQe+OBJsFA7Ld4DyXuUIjZ5cc75cLHvJ7dtNsTugphxIADwspS+AraAUePCKrSVtPLFj/F88w==}
 
@@ -1527,6 +1542,10 @@ snapshots:
       tinyexec: 1.0.1
 
   ohash@2.0.11: {}
+
+  openai@6.0.1(zod@3.25.76):
+    optionalDependencies:
+      zod: 3.25.76
 
   pathe@2.0.3: {}
 
