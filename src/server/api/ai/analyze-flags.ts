@@ -63,5 +63,5 @@ export async function analyzeFlags(rawText: string) {
 		throw new Error("Model output parsing failed");
 	}
 
-	return parsed;
+	return parsed.flags ?? [];
 }
