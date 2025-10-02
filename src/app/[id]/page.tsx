@@ -11,5 +11,8 @@ export default async function DetailView({
 		throw new Error("Contract not found");
 	}
 
-	return <ContractDetailPane contract={contract} />;
+	const flags = await api.contract.getFlagsByContractId({ id });
+	console.log(flags);
+
+	return <ContractDetailPane contract={contract} flags={flags} />;
 }

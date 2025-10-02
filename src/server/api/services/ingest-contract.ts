@@ -1,10 +1,13 @@
 import { db } from "@/server/db";
 import type { ContractStatus, FlagType, RiskLevel } from "@prisma/client";
 
-import { analyzeFlags } from "../ai/analyze-flags";
+import { analyzeClause } from "../ai/analyze-clause";
+import { extractContractData } from "../ai/extract-contract-data";
 import { checkIsSafe } from "../ai/is-safe";
 
-function deriveContractStatus(risks: RiskLevel[]): ContractStatus {
+function deriveContractStatus(
+	risks: (RiskLevel | undefined)[],
+): ContractStatus {
 	if (risks.includes("Escalate")) return "Escalate";
 	if (risks.includes("Caution")) return "Caution";
 	return "Safe";
@@ -32,6 +35,7 @@ export async function ingestContract(contractId: string) {
 	});
 
 	// First, do a quick check if the contract is safe. If it is, we can skip the rest of the analysis.
+	// Note: we might be able to remove this because of the new clause extraction
 	try {
 		const safe = await checkIsSafe(contract.rawText);
 
@@ -64,29 +68,72 @@ export async function ingestContract(contractId: string) {
 	}
 
 	// If the contract is identified as not safe, we need to analyze in detail the clauses.
+	// First, we'll get the clauses.
 	try {
 		const contract = await db.contract.findUniqueOrThrow({
 			where: { id: contractId },
 		});
 
-		const flags = await analyzeFlags(contract.rawText);
+		const { data: contractData } = await extractContractData(contract.rawText);
+		await db.contract.update({
+			where: { id: contractId },
+			data: {
+				title: contractData.title,
+				contractDate: contractData.date,
+			},
+		});
 
-		// Insert flagged clauses
-		if (flags.length) {
-			await db.flaggedClause.createMany({
-				data: flags.map((f) => ({
-					contractId: contract.id,
-					type: f.type,
-					risk: f.risk,
-					snippet: f.snippet,
-					start: f.start,
-					end: f.end,
+		const { count } = await db.clause.createMany({
+			data: contractData.clauses.map((c) => ({
+				contractId: contract.id,
+				title: c.title,
+				contents: c.contents,
+			})),
+		});
+		console.log(`Created ${count} clauses`);
+	} catch (err) {
+		console.error("Clause extraction failed", err);
+		return db.contract.update({
+			where: { id: contractId },
+			data: {
+				status: "Failed",
+				analysisStatus: "Failed",
+				analysisError: String(err instanceof Error ? err.message : err),
+			},
+		});
+	}
+
+	// Now, we'll analyze the clauses. We can do this in parallel to speed up the process.
+	try {
+		const clauses = await db.clause.findMany({
+			where: { contractId: contract.id },
+		});
+
+		const promises = clauses.map(async (clause) => {
+			console.log(`Analyzing clause ${clause.id}`);
+			const flags = await analyzeClause(clause.contents);
+			if (!flags.length) return;
+			console.log(`Found ${flags.length} flags for clause ${clause.id}`);
+			return db.flag.createMany({
+				data: flags.map((flag) => ({
+					clauseId: clause.id,
+					type: flag.type,
+					snippet: flag.snippet,
+					start: flag.start,
+					end: flag.end,
+					risk: flag.risk,
 				})),
 			});
-		}
+		});
+
+		await Promise.all(promises);
+
+		const flags = await db.flag.findMany({
+			where: { clauseId: { in: clauses.map((c) => c.id) } },
+		});
 
 		// Derive overall status
-		const risks = flags.map((f) => f.risk);
+		const risks = flags.map((c) => c.risk);
 		const overallStatus = deriveContractStatus(risks);
 
 		return db.contract.update({

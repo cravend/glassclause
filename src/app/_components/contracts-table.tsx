@@ -66,7 +66,12 @@ export function ContractsTable() {
 									{shortId(contract.id)}
 								</Link>
 							</TableCell>
-							<TableCell>---</TableCell>
+							<TableCell>
+								{/* Time constraint: because of the `isSafe` check, we don't extract this date for safe contracts :-( */}
+								{contract.contractDate
+									? new Date(contract.contractDate).toLocaleDateString()
+									: "---"}
+							</TableCell>
 							<TableCell>
 								{`${contract.createdAt.toLocaleDateString()} ${contract.createdAt.toLocaleTimeString()}`}
 							</TableCell>

@@ -29,20 +29,19 @@ If no clause justifies a flag, return an empty array for "flags".
 const client = new OpenAI({ apiKey: env.OPENAI_API_KEY });
 
 /**
- * Analyze the flags in the given raw text using OpenAI
+ * Analyze the flags in the given clause using OpenAI
  */
-export async function analyzeFlags(rawText: string) {
+export async function analyzeClause(rawText: string) {
 	const response = await client.chat.completions.create({
 		model: "gpt-5-mini",
 		response_format: { type: "json_object" },
 		messages: [
 			{ role: "system", content: SYSTEM_PROMPT },
-			{ role: "user", content: `Full NDA text:\n"""${rawText}"""` },
+			{ role: "user", content: rawText },
 		],
 	});
 
 	const raw = response.choices[0]?.message?.content ?? "{}";
-	console.log("Model output", raw);
 
 	// TODO: Use Zod to parse the output
 	let parsed: {
@@ -57,11 +56,11 @@ export async function analyzeFlags(rawText: string) {
 
 	try {
 		parsed = JSON.parse(raw);
-		console.log("Parsed model output", parsed);
 	} catch (err) {
-		console.error("Failed to parse model output", raw, err);
-		throw new Error("Model output parsing failed");
+		console.error("Failed to parse clause output", raw, err);
+		throw new Error("Clause output parsing failed");
 	}
 
-	return parsed.flags ?? [];
+	const flags = parsed.flags ?? [];
+	return flags.filter((f) => f.type !== "Other");
 }

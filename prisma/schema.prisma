@@ -29,9 +29,8 @@ enum AnalysisStatus {
     Failed
 }
 
-// Risk level of a clause.
+// Risk level of a flag.
 enum RiskLevel {
-    Safe
     Caution
     Escalate
 }
@@ -50,29 +49,45 @@ enum FlagType {
  */
 
 model Contract {
-    id        String   @id @default(cuid())
-    rawText   String
-    createdAt DateTime @default(now())
-    updatedAt DateTime @default(now()) @updatedAt
+    id           String   @id @default(cuid())
+    rawText      String
+    createdAt    DateTime @default(now())
+    updatedAt    DateTime @default(now()) @updatedAt
+    title        String?
+    contractDate String?
 
     status ContractStatus @default(Processing)
 
     analysisStatus AnalysisStatus @default(Queued)
     analysisError  String?
 
-    flaggedClauses FlaggedClause[]
+    clauses Clause[]
 }
 
-model FlaggedClause {
+model Clause {
     id         String   @id @default(cuid())
     contractId String
     contract   Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
 
-    type    FlagType
-    risk    RiskLevel @default(Escalate)
-    snippet String
-    start   Int
-    end     Int
+    title    String
+    contents String
+
+    flags Flag[]
 
     createdAt DateTime @default(now())
+    updatedAt DateTime @default(now()) @updatedAt
+}
+
+model Flag {
+    id       String @id @default(cuid())
+    clauseId String
+    clause   Clause @relation(fields: [clauseId], references: [id], onDelete: Cascade)
+
+    risk      RiskLevel
+    type      FlagType
+    snippet   String
+    start     Int
+    end       Int
+    createdAt DateTime  @default(now())
+    updatedAt DateTime  @default(now()) @updatedAt
 }

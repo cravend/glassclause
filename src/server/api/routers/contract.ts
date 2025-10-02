@@ -28,7 +28,14 @@ export const contractRouter = createTRPCRouter({
 		.query(async ({ ctx, input }) => {
 			return ctx.db.contract.findUnique({
 				where: { id: input.id },
-				include: { flaggedClauses: true },
+				include: { clauses: true },
+			});
+		}),
+	getFlagsByContractId: publicProcedure
+		.input(z.object({ id: z.string() }))
+		.query(async ({ ctx, input }) => {
+			return ctx.db.flag.findMany({
+				where: { clause: { contractId: input.id } },
 			});
 		}),
 });

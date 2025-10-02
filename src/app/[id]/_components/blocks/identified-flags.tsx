@@ -14,7 +14,7 @@ import {
 	TooltipTrigger,
 } from "@/components/ui";
 import type { ContractDetails } from "@/types/prisma";
-import type { RiskLevel } from "@prisma/client";
+import type { Flag, RiskLevel } from "@prisma/client";
 import { Flag as FlagIcon } from "lucide-react";
 import { useMemo, useState } from "react";
 
@@ -36,23 +36,26 @@ function RiskBadge({ risk }: { risk: RiskLevel }) {
 
 export function IdentifiedFlagsBlock({
 	contract,
+	flags,
 }: {
 	contract: ContractDetails;
+	flags: Flag[];
 }) {
 	const [search, setSearch] = useState("");
 
+	console.log(flags);
 	const filteredFlags = useMemo(() => {
-		if (!search.trim()) return contract.flaggedClauses;
+		if (!search.trim()) return flags;
 		const q = search.toLowerCase();
-		return contract.flaggedClauses.filter(
+		return flags.filter(
 			(f) =>
 				f.type.toLowerCase().includes(q) ||
 				f.risk.toLowerCase().includes(q) ||
 				f.snippet.toLowerCase().includes(q),
 		);
-	}, [search, contract.flaggedClauses]);
+	}, [search, flags]);
 
-	if (contract.flaggedClauses.length === 0) return null;
+	if (flags.length === 0) return null;
 	return (
 		<Card>
 			<CardHeader className="pb-3">
@@ -76,7 +79,7 @@ export function IdentifiedFlagsBlock({
 				<Separator />
 				<ScrollArea className="h-[360px]">
 					{filteredFlags.length === 0 ? (
-						contract.flaggedClauses.length === 0 ? (
+						flags.length === 0 ? (
 							<p className="text-sm text-zinc-400">No flags found.</p>
 						) : (
 							<p className="text-sm text-zinc-400">No flags match.</p>

@@ -1,6 +1,6 @@
 import { StatusBadge } from "@/components/status-badge";
 import { Button, Separator } from "@/components/ui";
-import type { ContractDetails } from "@/types/prisma";
+import type { ContractDetails, Flag } from "@/types/prisma";
 import { ArrowLeft, FileText, Loader2 } from "lucide-react";
 import Link from "next/link";
 import {
@@ -12,8 +12,10 @@ import {
 
 export function ContractDetailPane({
 	contract,
+	flags,
 }: {
 	contract: ContractDetails;
+	flags: Flag[];
 }) {
 	return (
 		<main className="mx-auto max-w-7xl space-y-6 px-4 py-6">
@@ -41,13 +43,13 @@ export function ContractDetailPane({
 
 			<div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
 				<div className="space-y-6 lg:col-span-4">
-					<IdentifiedFlagsBlock contract={contract} />
+					<IdentifiedFlagsBlock contract={contract} flags={flags} />
 					<ActionItemsBlock contract={contract} />
 				</div>
 
 				<div className="lg:col-span-8">
 					<StatusSummaryBlock contract={contract} />
-					<ContractViewerBlock contract={contract} />
+					<ContractViewerBlock contract={contract} flags={flags} />
 				</div>
 			</div>
 		</main>

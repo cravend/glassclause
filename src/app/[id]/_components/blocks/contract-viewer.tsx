@@ -11,16 +11,17 @@ import {
 	Tabs,
 	TabsContent,
 } from "@/components/ui";
-import type { ContractDetails, FlaggedClause } from "@/types/prisma";
+import type { Clause, ContractDetails, Flag } from "@/types/prisma";
 import { FileText } from "lucide-react";
 import * as React from "react";
 
 // Split text and wrap flagged ranges with anchors for click-to-scroll
-function useHighlightedNodes(text: string, flags: FlaggedClause[]) {
+// For now it doesn't work and I don't have time to fix it. :-(
+function useHighlightedNodes(text: string, flaggedClauses: Flag[]) {
 	return React.useMemo(() => {
-		if (!flags?.length) return [text];
+		if (!flaggedClauses?.length) return [text];
 
-		const ranges = [...flags]
+		const ranges = [...flaggedClauses]
 			.sort((a, b) => a.start - b.start)
 			.map(({ start, end }, i) => ({ start, end, id: `flag-${i}` }));
 
@@ -42,18 +43,17 @@ function useHighlightedNodes(text: string, flags: FlaggedClause[]) {
 		}
 		if (cursor < text.length) nodes.push(text.slice(cursor));
 		return nodes;
-	}, [text, flags]);
+	}, [text, flaggedClauses]);
 }
 
 export function ContractViewerBlock({
 	contract,
+	flags,
 }: {
 	contract: ContractDetails;
+	flags: Flag[];
 }) {
-	const highlighted = useHighlightedNodes(
-		contract.rawText,
-		contract.flaggedClauses,
-	);
+	// const annotatedText = useHighlightedNodes(contract.rawText, flaggedClauses);
 
 	return (
 		<Card>
@@ -73,22 +73,13 @@ export function ContractViewerBlock({
 			</CardHeader>
 			<Separator />
 			<CardContent>
-				<Tabs defaultValue="text">
-					<TabsContent value="text" className="mt-0">
-						<ScrollArea className="h-[68vh] rounded-md border border-zinc-800 p-4">
-							<article className="prose prose-invert max-w-none">
-								<p className="whitespace-pre-wrap leading-relaxed">
-									{highlighted}
-								</p>
-							</article>
-						</ScrollArea>
-					</TabsContent>
-					<TabsContent value="preview" className="mt-0">
-						<div className="flex h-[68vh] items-center justify-center text-sm text-zinc-400">
-							PDF rendering placeholder
-						</div>
-					</TabsContent>
-				</Tabs>
+				<ScrollArea className="h-[68vh] rounded-md border border-zinc-800 p-4">
+					<article className="prose prose-invert max-w-none">
+						<p className="whitespace-pre-wrap leading-relaxed">
+							{contract.rawText}
+						</p>
+					</article>
+				</ScrollArea>
 			</CardContent>
 		</Card>
 	);

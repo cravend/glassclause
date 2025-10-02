@@ -8,7 +8,7 @@ export function StatusBadge({ status }: { status: ContractStatus }) {
 			className: "bg-sky-500/10 text-sky-400 border-sky-500/20",
 		},
 		Unsafe: {
-			label: "Processing (partial)",
+			label: "Processing (warning)",
 			className: "bg-amber-500/10 text-amber-400 border-amber-500/20",
 		},
 		Safe: {
