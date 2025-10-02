@@ -8,10 +8,7 @@ export default async function Home() {
 			<h2 className="font-bold text-2xl">Process Contract</h2>
 			<NewContract />
 			<Separator />
-			<div>
-				<h2 className="pb-4 font-bold text-2xl">Previous Contracts</h2>
-				<ContractsTable />
-			</div>
+			<ContractsTable />
 			<Separator />
 			<h2 className="pb-4 font-bold text-2xl">Test data</h2>
 			<p>

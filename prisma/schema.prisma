@@ -14,6 +14,7 @@ generator client {
 // User-facing status of a contract.
 enum ContractStatus {
     Processing
+    Unsafe
     Safe
     Caution
     Escalate

@@ -45,6 +45,12 @@ export async function ingestContract(contractId: string) {
 				},
 			});
 		}
+		// If the contract is not safe, we need to analyze the clauses. We can tell
+		// the UI that the analysis is running but that we know it's unsafe.
+		await db.contract.update({
+			where: { id: contract.id },
+			data: { status: "Unsafe" },
+		});
 	} catch (err) {
 		console.error("Safe check failed", err);
 		return db.contract.update({
