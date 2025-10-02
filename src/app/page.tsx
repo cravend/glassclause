@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
+import { ContractsTable } from "./_components/contracts-table";
 
 export default async function Home() {
 	return (
@@ -16,7 +17,10 @@ export default async function Home() {
 				</CardFooter>
 			</Card>
 			<Separator />
-			<h2 className="font-bold text-2xl">Previous Contracts</h2>
+			<div>
+				<h2 className="pb-4 font-bold text-2xl">Previous Contracts</h2>
+				<ContractsTable />
+			</div>
 		</main>
 	);
 }
