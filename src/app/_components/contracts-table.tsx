@@ -15,7 +15,7 @@ import { api } from "@/trpc/react";
 
 const VARIANTS = {
 	Processing: "outline",
-	Safe: "default",
+	Safe: "warning",
 	Caution: "warning",
 	Unsafe: "destructive",
 	Escalate: "destructive",
