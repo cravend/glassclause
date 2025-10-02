@@ -1,63 +1,78 @@
+"use client";
+
 import { Badge } from "@/components/ui/badge";
 import {
 	Table,
 	TableBody,
+	TableCaption,
 	TableCell,
 	TableHead,
 	TableHeader,
 	TableRow,
 } from "@/components/ui/table";
 import { sentenceCase } from "@/lib/utils";
-
-const MOCK_CONTRACTS = [
-	{
-		id: "1005",
-		contractDate: new Date("2025-10-01"),
-		processedDate: new Date("2025-10-02"),
-		status: "processing" as const,
-	},
-	{
-		id: "1004",
-		contractDate: new Date("2025-03-20"),
-		processedDate: new Date("2025-03-25"),
-		status: "safe" as const,
-	},
-	{
-		id: "1003",
-		contractDate: new Date("2025-03-05"),
-		processedDate: new Date("2025-03-10"),
-		status: "escalate" as const,
-	},
-	{
-		id: "1002",
-		contractDate: new Date("2025-02-10"),
-		processedDate: new Date("2025-02-15"),
-		status: "caution" as const,
-	},
-	{
-		id: "1001",
-		contractDate: new Date("2025-01-15"),
-		processedDate: new Date("2025-01-20"),
-		status: "safe" as const,
-	},
-];
+import { api } from "@/trpc/react";
 
 const VARIANTS = {
-	safe: "default",
-	processing: "secondary",
-	caution: "warning",
-	escalate: "destructive",
-} as const;
+	Processing: "default",
+	Safe: "default",
+	Caution: "default",
+	Escalate: "default",
+	Failed: "default",
+} as const satisfies Record<
+	NonNullable<Prisma.ContractCreateInput["status"]>,
+	unknown
+>;
+
+import type { Prisma } from "@prisma/client";
 
 function StatusBadge({
 	status,
-}: { status: (typeof MOCK_CONTRACTS)[number]["status"] }) {
+}: { status: NonNullable<Prisma.ContractCreateInput["status"]> }) {
 	return <Badge variant={VARIANTS[status]}>{sentenceCase(status)}</Badge>;
 }
 
 export function ContractsTable() {
+	const { data, isLoading, isSuccess } = api.contract.getAll.useQuery();
+
+	const hasData = isSuccess && data.length > 0;
+
 	return (
 		<Table>
+			{hasData ? null : (
+				<TableCaption>
+					{isLoading ? (
+						<div className="flex flex-col items-center justify-center text-center">
+							<div className="mx-auto h-12 w-12 text-muted-foreground">
+								<h3 className="mt-4 font-semibold text-lg">Loading...</h3>
+							</div>
+						</div>
+					) : (
+						<div className="flex flex-col items-center justify-center py-12 text-center">
+							<div className="mx-auto h-12 w-12 text-muted-foreground">
+								<svg
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+									xmlns="http://www.w3.org/2000/svg"
+								>
+									<title>No contracts yet</title>
+									<path
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										strokeWidth={1.5}
+										d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+									/>
+								</svg>
+							</div>
+							<h3 className="mt-4 font-semibold text-lg">No contracts yet</h3>
+							<p className="mt-2 text-muted-foreground text-sm">
+								Upload your first contract to get started with analysis.
+							</p>
+						</div>
+					)}
+				</TableCaption>
+			)}
 			<TableHeader>
 				<TableRow>
 					<TableHead className="w-[100px]">ID</TableHead>
@@ -67,12 +82,16 @@ export function ContractsTable() {
 				</TableRow>
 			</TableHeader>
 			<TableBody>
-				{MOCK_CONTRACTS.map((contract) => (
+				{data?.map((contract) => (
 					<TableRow key={contract.id}>
-						<TableCell className="font-medium">{contract.id}</TableCell>
-						<TableCell>{contract.contractDate.toLocaleDateString()}</TableCell>
-						<TableCell>{contract.processedDate.toLocaleDateString()}</TableCell>
+						{/* This is temporary, I should use better titles */}
+						<TableCell className="font-medium">
+							{contract.id.slice(contract.id.length - 4, contract.id.length)}
+						</TableCell>
+						<TableCell>---</TableCell>
+						<TableCell>{contract.createdAt.toLocaleDateString()}</TableCell>
 						<TableCell className="text-right">
+							{/* This is temporary until we introduce statuses */}
 							<StatusBadge status={contract.status} />
 						</TableCell>
 					</TableRow>
