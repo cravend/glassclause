@@ -26,6 +26,9 @@ export const contractRouter = createTRPCRouter({
 	getById: publicProcedure
 		.input(z.object({ id: z.string() }))
 		.query(async ({ ctx, input }) => {
-			return ctx.db.contract.findUnique({ where: { id: input.id } });
+			return ctx.db.contract.findUnique({
+				where: { id: input.id },
+				include: { flaggedClauses: true },
+			});
 		}),
 });

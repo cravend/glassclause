@@ -1,6 +1,5 @@
 "use client";
 
-import { Badge } from "@/components/ui/badge";
 import {
 	Table,
 	TableBody,
@@ -10,28 +9,10 @@ import {
 	TableHeader,
 	TableRow,
 } from "@/components/ui/table";
-import { sentenceCase } from "@/lib/utils";
 import { api } from "@/trpc/react";
 
-const VARIANTS = {
-	Processing: "outline",
-	Safe: "warning",
-	Caution: "warning",
-	Unsafe: "destructive",
-	Escalate: "destructive",
-	Failed: "outline",
-} as const satisfies Record<
-	NonNullable<Prisma.ContractCreateInput["status"]>,
-	unknown
->;
-
-import type { Prisma } from "@prisma/client";
-
-function StatusBadge({
-	status,
-}: { status: NonNullable<Prisma.ContractCreateInput["status"]> }) {
-	return <Badge variant={VARIANTS[status]}>{sentenceCase(status)}</Badge>;
-}
+import { StatusBadge } from "@/components/status-badge";
+import Link from "next/link";
 
 export function ContractsTable() {
 	const { data, isLoading, isSuccess } = api.contract.getAll.useQuery(
@@ -116,7 +97,9 @@ export function ContractsTable() {
 						{data?.map((contract) => (
 							<TableRow key={contract.id}>
 								{/* This is temporary, I should use better titles */}
-								<TableCell className="font-medium">{contract.id}</TableCell>
+								<TableCell className="font-medium">
+									<Link href={`/${contract.id}`}>{contract.id}</Link>
+								</TableCell>
 								<TableCell>---</TableCell>
 								<TableCell>{contract.createdAt.toLocaleDateString()}</TableCell>
 								<TableCell className="text-right">

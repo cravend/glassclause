@@ -1,10 +1,12 @@
-import { Prisma } from "@prisma/client";
+import { Prisma, type RiskLevel } from "@prisma/client";
 
 export type {
 	ContractStatus,
 	AnalysisStatus,
 	FlagType,
 	RiskLevel,
+	Contract,
+	FlaggedClause,
 } from "@prisma/client";
 
 /* -------------------------------------------------------------------------- */
@@ -20,4 +22,8 @@ export const contractList = Prisma.validator<Prisma.ContractSelect>()({
 
 export type ContractList = Prisma.ContractGetPayload<{
 	select: typeof contractList;
+}>;
+
+export type ContractDetails = Prisma.ContractGetPayload<{
+	include: { flaggedClauses: true };
 }>;
