@@ -1,9 +1,5 @@
-import { env } from "@/env";
-import type { Simplify } from "@trpc/server/unstable-core-do-not-import";
-
-import OpenAI from "openai";
-
-const client = new OpenAI({ apiKey: env.OPENAI_API_KEY });
+import type { Simplify } from "type-fest";
+import { client } from "./openai";
 
 type ExtractedContract = Simplify<{
 	title: string;
@@ -30,7 +26,7 @@ export async function extractContractData(rawText: string) {
 		include: ["reasoning.encrypted_content"],
 	});
 
-	const raw = response.output_text;
+	const raw = response.output_text ?? "{}";
 
 	let parsed: ExtractedContract;
 
