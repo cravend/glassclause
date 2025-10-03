@@ -77,7 +77,8 @@ export function ContractsTable() {
 							</TableCell>
 							<TableCell>
 								{Math.floor(contract.updatedAt.getTime() / 1000) ===
-								Math.floor(contract.createdAt.getTime() / 1000)
+									Math.floor(contract.createdAt.getTime() / 1000) ||
+								contract.status === "Processing"
 									? "---"
 									: `${contract.updatedAt.toLocaleDateString()} ${contract.updatedAt.toLocaleTimeString()}`}
 							</TableCell>
