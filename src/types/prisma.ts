@@ -20,6 +20,7 @@ export const contractList = Prisma.validator<Prisma.ContractSelect>()({
 	updatedAt: true,
 	contractDate: true,
 	status: true,
+	analysisStatus: true,
 });
 
 export type ContractList = Prisma.ContractGetPayload<{

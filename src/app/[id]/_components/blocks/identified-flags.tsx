@@ -19,7 +19,6 @@ import { Flag as FlagIcon } from "lucide-react";
 import { useMemo, useState } from "react";
 
 function RiskBadge({ risk }: { risk: RiskLevel }) {
-	if (risk === "Safe") return null;
 	return (
 		<Badge
 			variant="outline"

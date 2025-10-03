@@ -17,9 +17,9 @@ export function ContractsTable() {
 	const query = api.contract.getAll.useQuery(undefined, {
 		refetchInterval: (ctx) => {
 			const anyProcessing = ctx.state.data?.some(
-				(c) => c.status === "Processing" || c.status === "Unsafe",
+				(c) => c.analysisStatus === "Running" || c.analysisStatus === "Queued",
 			);
-			return anyProcessing ? 4000 : false;
+			return anyProcessing ? 2000 : false;
 		},
 	});
 
@@ -33,7 +33,8 @@ export function ContractsTable() {
 					Previous Contracts
 				</h2>
 				{data.some(
-					(c) => c.status === "Processing" || c.status === "Unsafe",
+					(c) =>
+						c.analysisStatus === "Running" || c.analysisStatus === "Queued",
 				) && (
 					<div className="flex items-center gap-2 text-muted-foreground text-sm">
 						<span className="h-2 w-2 animate-pulse rounded-full bg-primary" />
